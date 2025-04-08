@@ -1,0 +1,28 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: workdir-cleaning
+  namespace: greenroom
+spec:
+  schedule: "0 1 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: workdir-cleaning
+            image: 10.32.42.225:5000/workdir-cleaning:latest
+            imagePullPolicy: Always
+            env:
+            - name: env
+              value: "charite"
+            volumeMounts:
+            - name: nfsvol
+              mountPath: /data/vre-storage
+          volumes:
+            - name: nfsvol
+              persistentVolumeClaim:
+                claimName: greenroom-storage
+          nodeSelector:
+            namespace: greenroom

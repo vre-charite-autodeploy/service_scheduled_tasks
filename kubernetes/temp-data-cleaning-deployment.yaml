@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: temp-data-cleaning
+  namespace: greenroom
+spec:
+  selector:
+    matchLabels:
+      app: temp-data-cleaning
+      env: charite
+  template:
+    metadata:
+      labels:
+        app: temp-data-cleaning
+        env: charite
+    spec:
+      containers:
+      - name: temp-data-cleaning
+        image: 10.32.42.225:5000/temp-data-clean:latest
+        imagePullPolicy: Always
+        env:
+        - name: env
+          value: "charite"
+        volumeMounts:
+        - name: temp-volume
+          mountPath: /tmp/dataops
+      volumes:
+        - name: temp-volume
+          hostPath:
+            path: /data01/dataops
+            type: Directory
+      nodeSelector:
+        namespace: greenroom
